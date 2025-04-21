@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel d'Embeds OB Zelda</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #2c2f33;
+            color: #ffffff;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #36393f;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        h1 {
+            color: #7289da;
+            text-align: center;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #23272a;
+            border-radius: 4px;
+            background-color: #40444b;
+            color: #ffffff;
+        }
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        .color-preview {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            margin-left: 10px;
+            vertical-align: middle;
+            border: 1px solid #23272a;
+        }
+        button {
+            background-color: #7289da;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            display: block;
+            margin: 20px auto;
+            width: 200px;
+        }
+        button:hover {
+            background-color: #5f73bc;
+        }
+        .preview {
+            margin-top: 30px;
+            padding: 15px;
+            background-color: #2f3136;
+            border-radius: 4px;
+            border-left: 4px solid #7289da;
+        }
+        .preview-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        .preview-description {
+            font-size: 14px;
+            color: #dcddde;
+        }
+        .preview-image {
+            max-width: 100%;
+            margin-top: 10px;
+            border-radius: 4px;
+        }
+        .preview-thumbnail {
+            max-width: 80px;
+            margin-top: 10px;
+            border-radius: 4px;
+            float: right;
+        }
+        .auth-section {
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: #23272a;
+            border-radius: 4px;
+        }
+        .channels-dropdown {
+            margin-bottom: 20px;
+        }
+        .error {
+            color: #ed4245;
+            margin-top: 10px;
+            padding: 10px;
+            background-color: rgba(237, 66, 69, 0.1);
+            border-radius: 4px;
+            display: none;
+        }
+        .success {
+            color: #43b581;
+            margin-top: 10px;
+            padding: 10px;
+            background-color: rgba(67, 181, 129, 0.1);
+            border-radius: 4px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Panel d'Embeds OB Zelda</h1>
+        
+        <div class="auth-section">
+            <div class="form-group">
+                <label for="webhook-url">URL du Webhook Discord :</label>
+                <input type="text" id="webhook-url" placeholder="https://discord.com/api/webhooks/...">
+            </div>
+        </div>
+        
+        <div class="form-group channels-dropdown">
+            <label for="channel-id">Canal de destination :</label>
+            <select id="channel-id">
+                <option value="1340250246038683689">🤖・bot-commands</option>
+                <option value="1348227800355569707">👋・bienvenue</option>
+                <!-- Ajoutez d'autres canaux selon vos besoins -->
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="embed-title">Titre :</label>
+            <input type="text" id="embed-title" placeholder="Titre de l'embed">
+        </div>
+        
+        <div class="form-group">
+            <label for="embed-description">Description :</label>
+            <textarea id="embed-description" placeholder="Description de l'embed (supporte le markdown)"></textarea>
+        </div>
+        
+        <div class="form-group">
+            <label for="embed-color">Couleur :</label>
+            <input type="text" id="embed-color" placeholder="#7289DA">
+            <span class="color-preview" id="color-preview" style="background-color: #7289DA;"></span>
+        </div>
+        
+        <div class="form-group">
+            <label for="embed-image">URL de l'image :</label>
+            <input type="text" id="embed-image" placeholder="https://exemple.com/image.png">
+        </div>
+        
+        <div class="form-group">
+            <label for="embed-thumbnail">URL de la miniature :</label>
+            <input type="text" id="embed-thumbnail" placeholder="https://exemple.com/miniature.png">
+        </div>
+        
+        <h2>Aperçu :</h2>
+        <div class="preview" id="embed-preview">
+            <div class="preview-title" id="preview-title">Titre de l'exemple</div>
+            <div class="preview-description" id="preview-description">Ceci est une description d'exemple.</div>
+            <img src="/api/placeholder/400/200" alt="Image d'aperçu" class="preview-image" id="preview-image" style="display: none;">
+            <img src="/api/placeholder/80/80" alt="Miniature d'aperçu" class="preview-thumbnail" id="preview-thumbnail" style="display: none;">
+        </div>
+        
+        <button id="send-button">Envoyer l'embed</button>
+        
+        <div class="error" id="error-message"></div>
+        <div class="success" id="success-message"></div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Fonction pour mettre à jour l'aperçu
+            function updatePreview() {
+                const title = document.getElementById('embed-title').value;
+                const description = document.getElementById('embed-description').value;
+                const color = document.getElementById('embed-color').value;
+                const imageUrl = document.getElementById('embed-image').value;
+                const thumbnailUrl = document.getElementById('embed-thumbnail').value;
+                
+                document.getElementById('preview-title').textContent = title || 'Titre de l\'exemple';
+                document.getElementById('preview-description').textContent = description || 'Ceci est une description d\'exemple.';
+                
+                if (color) {
+                    document.getElementById('color-preview').style.backgroundColor = color;
+                    document.querySelector('.preview').style.borderLeftColor = color;
+                }
+                
+                const previewImage = document.getElementById('preview-image');
+                if (imageUrl) {
+                    previewImage.src = imageUrl;
+                    previewImage.style.display = 'block';
+                } else {
+                    previewImage.style.display = 'none';
+                }
+                
+                const previewThumbnail = document.getElementById('preview-thumbnail');
+                if (thumbnailUrl) {
+                    previewThumbnail.src = thumbnailUrl;
+                    previewThumbnail.style.display = 'block';
+                } else {
+                    previewThumbnail.style.display = 'none';
+                }
+            }
+            
+            // Ajouter des écouteurs d'événements aux champs de saisie
+            document.getElementById('embed-title').addEventListener('input', updatePreview);
+            document.getElementById('embed-description').addEventListener('input', updatePreview);
+            document.getElementById('embed-color').addEventListener('input', updatePreview);
+            document.getElementById('embed-image').addEventListener('input', updatePreview);
+            document.getElementById('embed-thumbnail').addEventListener('input', updatePreview);
+            
+            // Fonction pour envoyer l'embed via le webhook
+            document.getElementById('send-button').addEventListener('click', async function() {
+                const webhookUrl = document.getElementById('webhook-url').value;
+                if (!webhookUrl) {
+                    showError("L'URL du webhook est requise !");
+                    return;
+                }
+                
+                const channelId = document.getElementById('channel-id').value;
+                const title = document.getElementById('embed-title').value;
+                const description = document.getElementById('embed-description').value;
+                const color = document.getElementById('embed-color').value;
+                const imageUrl = document.getElementById('embed-image').value;
+                const thumbnailUrl = document.getElementById('embed-thumbnail').value;
+                
+                // Calculer la valeur numérique de la couleur hexadécimale pour Discord
+                let colorValue = 0;
+                if (color && color.startsWith('#')) {
+                    colorValue = parseInt(color.slice(1), 16);
+                }
+                
+                const payload = {
+                    content: "!embed", // Signal pour le bot
+                    embeds: [{
+                        title: title,
+                        description: description,
+                        color: colorValue,
+                        image: imageUrl ? { url: imageUrl } : null,
+                        thumbnail: thumbnailUrl ? { url: thumbnailUrl } : null,
+                        footer: {
+                            text: "Envoyé depuis le Panel d'Embeds OB Zelda"
+                        }
+                    }],
+                    // Ajouter des métadonnées pour que le bot sache où envoyer l'embed
+                    channelId: channelId
+                };
+                
+                try {
+                    const response = await fetch(webhookUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(payload)
+                    });
+                    
+                    if (response.ok) {
+                        showSuccess("Embed envoyé avec succès !");
+                    } else {
+                        const errorData = await response.json();
+                        showError(`Erreur: ${errorData.message || response.statusText}`);
+                    }
+                } catch (error) {
+                    showError(`Erreur: ${error.message}`);
+                }
+            });
+            
+            function showError(message) {
+                const errorElement = document.getElementById('error-message');
+                errorElement.textContent = message;
+                errorElement.style.display = 'block';
+                document.getElementById('success-message').style.display = 'none';
+                setTimeout(() => {
+                    errorElement.style.display = 'none';
+                }, 5000);
+            }
+            
+            function showSuccess(message) {
+                const successElement = document.getElementById('success-message');
+                successElement.textContent = message;
+                successElement.style.display = 'block';
+                document.getElementById('error-message').style.display = 'none';
+                setTimeout(() => {
+                    successElement.style.display = 'none';
+                }, 5000);
+            }
+        });
+    </script>
+</body>
+</html>
