@@ -10,7 +10,7 @@
         body {
             font-family: 'Crimson Text', serif;
             background-color: #1a2e0d;
-            background-image: url('https://res.cloudinary.com/dor9octmp/image/upload/v1745175289/zelda-forest-bg_q8izpj.jpg');
+            background-image: url('https://res.cloudinary.com/dor9octmp/image/upload/v1744971567/Capture_d_e%CC%81cran_2025-04-18_a%CC%80_11.27.22_fncjkw.png');
             background-size: cover;
             background-attachment: fixed;
             color: #e8dfc1;
@@ -222,11 +222,26 @@
             width: calc(100% - 110px);
             display: inline-block;
         }
+        .add-field-button {
+            background-color: #4a90e2;
+            color: #e8dfc1;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            display: inline-block;
+            margin-top: 10px;
+            transition: all 0.3s ease;
+        }
+        .add-field-button:hover {
+            background-color: #5a7c46;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <img src="https://res.cloudinary.com/dor9octmp/image/upload/v1745175289/zelda-logo_bbrpb7.png" alt="Zelda Logo" class="logo">
+        <img src="https://res.cloudinary.com/dor9octmp/image/upload/v1745145521/Logo_discord_uj0p2v.png" alt="Zelda Logo" class="logo">
         <h1>Panel d'Embeds OB Zelda</h1>
 
         <div class="tab-container">
@@ -239,7 +254,7 @@
                 <div class="auth-section">
                     <div class="form-group">
                         <label for="bot-token">Clé d'authentification du Bot :</label>
-                        <input type="password" id="bot-token" placeholder="!&Q3cTcGmq3sP8cbXYK4Nc8xQhB4Gq5GXLn8jH4t">
+                        <input type="password" id="bot-token" placeholder="Votre clé d'authentification secrète" value="votre_token_secret_pour_le_panel">
                     </div>
                 </div>
             </div>
@@ -341,14 +356,18 @@
                 </div>
                 <!-- Ajoutez plus de champs si nécessaire -->
             </div>
+            <button class="add-field-button" id="add-field-button">Ajouter un champ</button>
         </div>
 
         <h2>Aperçu :</h2>
         <div class="preview" id="embed-preview">
             <div class="preview-title" id="preview-title">Bienvenue dans la forêt de Zelda</div>
             <div class="preview-description" id="preview-description">Découvrez les mystères de la forêt et les prestiges qui vous attendent sur notre serveur One-Block. Utilisez la commande /prestige pour connaître les prérequis.</div>
+            <div id="preview-author" class="preview-author"></div>
             <img src="/api/placeholder/400/200" alt="Image d'aperçu" class="preview-image" id="preview-image" style="display: none;">
             <img src="/api/placeholder/80/80" alt="Miniature d'aperçu" class="preview-thumbnail" id="preview-thumbnail" style="display: none;">
+            <div id="preview-fields" class="preview-fields"></div>
+            <div id="preview-footer" class="preview-footer"></div>
         </div>
 
         <button id="send-button">Envoyer l'embed</button>
@@ -632,6 +651,24 @@
 
             // Charger les salons au chargement de la page
             loadChannels();
+
+            // Fonction pour ajouter un nouveau champ (field)
+            document.getElementById('add-field-button').addEventListener('click', function() {
+                const fieldsContainer = document.getElementById('fields-container');
+                const fieldCount = fieldsContainer.querySelectorAll('.field').length + 1;
+
+                const newField = document.createElement('div');
+                newField.className = 'field';
+                newField.innerHTML = `
+                    <label for="field-name-${fieldCount}">Nom :</label>
+                    <input type="text" id="field-name-${fieldCount}" placeholder="Nom du champ">
+                    <label for="field-value-${fieldCount}">Valeur :</label>
+                    <input type="text" id="field-value-${fieldCount}" placeholder="Valeur du champ">
+                `;
+
+                fieldsContainer.appendChild(newField);
+                updatePreview(); // Mettre à jour l'aperçu après l'ajout du champ
+            });
         });
     </script>
 </body>
